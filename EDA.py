@@ -13,8 +13,8 @@ def date_to_datetime(df, date_column):
     df[date_column] = pd.to_datetime(df[date_column], dayfirst=True, errors='coerce')
     return df
 
-def save_as_csv(df):
-    df.to_csv('data/cleaned_books2.csv', index=False)
+def save_as_csv(df, new_file_path):
+    df.to_csv(new_file_path, index=False)
 
 def date_difference(df, column1, column2, new_column):
     df[new_column] = (df[column2] - df[column1]).dt.days
@@ -35,7 +35,11 @@ books = clean_date(books, 'Book checkout')
 books = date_to_datetime(books, 'Book checkout')
 books = date_to_datetime(books, 'Book Returned')
 books = date_difference(books, 'Book checkout', 'Book Returned', 'Time on Loan')
-save_as_csv(books)
+books = books.dropna()
+books = books[books['Time on Loan']>0]
+save_as_csv(books, 'data/cleaned_books2.csv')
 
-
+customers = load_data("data/03_Library SystemCustomers.csv")
+customers = customers.dropna()
+save_as_csv(customers, 'data/cleaned_customers.csv')
 
