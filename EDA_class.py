@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import numpy as np
 
@@ -45,8 +46,17 @@ class BookClean:
     def save_NA_any_csv(self, NA_any_file_path):
         self.any_nas.to_csv(NA_any_file_path, index=False)
 
+    def save_runtimelog(self, start_time, end_time, log_path):
+        runtime_df = pd.DataFrame({
+            'Process_Date':[pd.Timestamp.now()],
+            'Duration_Seconds':[round(end_time-start_time,4)]
+            })
+        runtime_df.to_csv(log_path, index=False)
+
     def main(self):
-        (books.drop_na_for_column('Id')
+        start_time = time.time()
+        (self
+          .drop_na_for_column('Id')
           .clean_string('Books')
           .clean_date('Book checkout')
           .date_to_datetime('Book Returned')
@@ -56,6 +66,8 @@ class BookClean:
           .save_as_csv('data/cleaned_books3.csv')
           .save_NA_ID_csv('data/books_NA_IDs.csv')
           .save_NA_any_csv('data/books_NA_any.csv'))
+        end_time = time.time()
+        self.save_runtimelog(start_time,end_time,'data/runtime_log.csv')
         
 if __name__ == "__main__":
 
